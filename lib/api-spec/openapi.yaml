@@ -1,0 +1,429 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Boselah - Academic & Career Guidance Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: assessment
+    description: Assessment and quiz operations
+  - name: recommendations
+    description: Recommendation operations
+  - name: majors
+    description: University majors operations
+  - name: careers
+    description: Career paths operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /assessment/questions:
+    get:
+      operationId: getAssessmentQuestions
+      tags: [assessment]
+      summary: Get all assessment questions
+      description: Returns all assessment questions grouped by category
+      responses:
+        "200":
+          description: Assessment questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuestionCategory"
+
+  /assessment/submit:
+    post:
+      operationId: submitAssessment
+      tags: [assessment]
+      summary: Submit assessment answers
+      description: Submit student answers and get AI-powered recommendations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssessmentSubmission"
+      responses:
+        "201":
+          description: Assessment result with recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+
+  /assessment/results/{id}:
+    get:
+      operationId: getAssessmentResult
+      tags: [assessment]
+      summary: Get assessment result by ID
+      description: Returns a previously saved assessment result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Assessment result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+        "404":
+          description: Result not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /majors:
+    get:
+      operationId: listMajors
+      tags: [majors]
+      summary: List all university majors
+      description: Returns all available university majors
+      responses:
+        "200":
+          description: List of majors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Major"
+
+  /careers:
+    get:
+      operationId: listCareers
+      tags: [careers]
+      summary: List all career paths
+      description: Returns all available career paths
+      responses:
+        "200":
+          description: List of careers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Career"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    QuestionOption:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        textEn:
+          type: string
+        value:
+          type: integer
+      required:
+        - id
+        - text
+        - value
+
+    Question:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        textEn:
+          type: string
+        category:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionOption"
+      required:
+        - id
+        - text
+        - category
+        - options
+
+    QuestionCategory:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        nameEn:
+          type: string
+        description:
+          type: string
+        descriptionEn:
+          type: string
+        icon:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+      required:
+        - id
+        - name
+        - description
+        - icon
+        - questions
+
+    AssessmentAnswer:
+      type: object
+      properties:
+        questionId:
+          type: string
+        selectedOptionId:
+          type: string
+        value:
+          type: integer
+        otherText:
+          type: string
+      required:
+        - questionId
+        - selectedOptionId
+        - value
+
+    AssessmentSubmission:
+      type: object
+      properties:
+        studentName:
+          type: string
+        educationLevel:
+          type: string
+        language:
+          type: string
+        country:
+          type: string
+        tawjihiStream:
+          type: string
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssessmentAnswer"
+      required:
+        - studentName
+        - educationLevel
+        - language
+        - country
+        - answers
+
+    RecommendedMajor:
+      type: object
+      properties:
+        name:
+          type: string
+        matchPercentage:
+          type: integer
+        description:
+          type: string
+        requiredSkills:
+          type: array
+          items:
+            type: string
+        universities:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - matchPercentage
+        - description
+        - requiredSkills
+        - universities
+
+    RecommendedCareer:
+      type: object
+      properties:
+        title:
+          type: string
+        matchPercentage:
+          type: integer
+        description:
+          type: string
+        averageSalary:
+          type: string
+        demandLevel:
+          type: string
+        growthOutlook:
+          type: string
+      required:
+        - title
+        - matchPercentage
+        - description
+        - averageSalary
+        - demandLevel
+        - growthOutlook
+
+    SkillRecommendation:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        importance:
+          type: string
+        description:
+          type: string
+      required:
+        - name
+        - category
+        - importance
+        - description
+
+    PersonalityProfile:
+      type: object
+      properties:
+        type:
+          type: string
+        description:
+          type: string
+        strengths:
+          type: array
+          items:
+            type: string
+        areasForGrowth:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - description
+        - strengths
+        - areasForGrowth
+
+    AssessmentResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentName:
+          type: string
+        educationLevel:
+          type: string
+        language:
+          type: string
+        country:
+          type: string
+        tawjihiStream:
+          type: string
+        personalityProfile:
+          $ref: "#/components/schemas/PersonalityProfile"
+        recommendedMajors:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecommendedMajor"
+        recommendedCareers:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecommendedCareer"
+        skillRecommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillRecommendation"
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - studentName
+        - educationLevel
+        - personalityProfile
+        - recommendedMajors
+        - recommendedCareers
+        - skillRecommendations
+        - createdAt
+
+    Major:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        faculty:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
+        requiredSkills:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - faculty
+        - description
+        - duration
+        - requiredSkills
+
+    Career:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        field:
+          type: string
+        description:
+          type: string
+        averageSalary:
+          type: string
+        demandLevel:
+          type: string
+        requiredMajors:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - title
+        - field
+        - description
+        - averageSalary
+        - demandLevel
+        - requiredMajors

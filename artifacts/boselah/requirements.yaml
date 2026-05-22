@@ -1,0 +1,19 @@
+packages:
+  "framer-motion": "For smooth page transitions and stagger animations in the quiz/results"
+  "canvas-confetti": "For celebration effect on the results page"
+  "@types/canvas-confetti": "Types for canvas-confetti"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility to merge tailwind classes without conflicts"
+
+images:
+  - path: "artifacts/boselah/public/images/hero-bg.png"
+    description: "Abstract modern minimalist background with a glowing stylized compass pointing forward, warm amber and deep teal colors, soft 3D educational shapes, high-end premium aesthetic"
+    aspect_ratio: "16:9"
+  - path: "artifacts/boselah/public/images/pattern.png"
+    description: "Subtle geometric dot pattern with soft glowing orbs in warm orange and teal, transparent background, for overlaying on sections"
+    aspect_ratio: "16:9"
+
+notes:
+  - RTL layout is strictly applied via dir="rtl" on the main container
+  - Using logical properties (ms-, me-, ps-, pe-) for spacing to support RTL naturally
+  - Using generated hooks from @workspace/api-client-react
